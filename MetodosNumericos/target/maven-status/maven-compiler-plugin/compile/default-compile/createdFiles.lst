@@ -1,0 +1,7 @@
+mx\edu\itses\mrc\MetodosNumericos\web\Unit2Controller.class
+mx\edu\itses\mrc\MetodosNumericos\services\UnidadIIServiceImpl.class
+mx\edu\itses\mrc\MetodosNumericos\services\Funciones.class
+mx\edu\itses\mrc\MetodosNumericos\services\UnidadIIService.class
+mx\edu\itses\mrc\MetodosNumericos\MetodosNumericosApplication.class
+mx\edu\itses\mrc\MetodosNumericos\web\MainController.class
+mx\edu\itses\mrc\MetodosNumericos\domain\Biseccion.class
