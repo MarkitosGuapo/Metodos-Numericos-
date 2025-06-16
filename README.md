@@ -10,7 +10,9 @@ En JAVA/NETBEANS IDE 21
 
 **Clona el repositorio:**
 
-**git clone https://github.com/tu_usuario/metodos-numericos.git**
+con ** https://github.com/MarkitosGuapo/Metodos-Numericos-.git**
+
+
 Navega a la carpeta del algoritmo que te interese.
 
 Ejecuta el programa según las instrucciones o compílalo si es necesario.
