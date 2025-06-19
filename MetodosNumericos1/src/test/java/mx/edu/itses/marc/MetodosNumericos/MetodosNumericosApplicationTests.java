@@ -1,4 +1,4 @@
-package mx.edu.itses.jylc.MetodosNumericos;
+package mx.edu.itses.marc.MetodosNumericos;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
