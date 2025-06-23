@@ -19,6 +19,8 @@ public class Unit2Controller {
     private UnidadIIService bisectionservice;
     @Autowired
     private UnidadIIService reglafalsaservice;
+    @Autowired
+    private UnidadIIService puntofijoservice;
 
     @GetMapping("unit2/formbisection")
     public String formBisecccion(Model model) {
@@ -57,4 +59,27 @@ public class Unit2Controller {
 
         return "/unit2/reglafalsa/solvereglafalsa";
     }
+    
+    @GetMapping("/unit2/formpuntofijo")
+public String formPuntoFijo(Model model) {
+    model.addAttribute("puntofijo", new mx.edu.itses.marc.MetodosNumericos.domain.PuntoFijo());
+    return "unit2/puntofijo/formpuntofijo"; 
+}
+
+@PostMapping("/unit2/solvepuntofijo")
+public String solvePuntoFijo(mx.edu.itses.marc.MetodosNumericos.domain.PuntoFijo puntofijo, Model model) {
+    var solucion = puntofijoservice.AlgoritmoDePuntoFijo(puntofijo);
+    model.addAttribute("solvePuntoFijo", solucion);
+    return "unit2/puntofijo/solvepuntofijo"; 
+}
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

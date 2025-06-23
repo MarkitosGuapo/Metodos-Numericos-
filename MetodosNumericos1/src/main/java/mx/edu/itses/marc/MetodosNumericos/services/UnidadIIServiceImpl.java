@@ -3,6 +3,7 @@ package mx.edu.itses.marc.MetodosNumericos.services;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.marc.MetodosNumericos.domain.Biseccion;
+import mx.edu.itses.marc.MetodosNumericos.domain.PuntoFijo;
 import mx.edu.itses.marc.MetodosNumericos.domain.ReglaFalsa;
 import org.springframework.stereotype.Service;
 
@@ -111,5 +112,44 @@ public class UnidadIIServiceImpl implements UnidadIIService {
 
         return respuesta;
     }
+
+  
+
+  
+    @Override
+    public ArrayList<PuntoFijo> AlgoritmoDePuntoFijo(PuntoFijo puntofijo) {
+       ArrayList<PuntoFijo> respuesta = new ArrayList<>();
+    double XL = puntofijo.getXL();
+    double GX, FX, Ea = 100, XRa = 0;
+
+    for (int i = 1; i <= puntofijo.getIteracionesMaximas(); i++) {
+        GX = Funciones.Ecuacion(puntofijo.getGXstring(), XL); // g(x)
+        FX = Funciones.Ecuacion(puntofijo.getFXstring(), GX); // f(x)
+
+        if (i != 1) {
+            Ea = Funciones.ErrorRelativo(GX, XRa);
+        }
+
+        PuntoFijo renglon = new PuntoFijo();
+        renglon.setXL(XL);
+        renglon.setGX(GX);
+        renglon.setFX(FX);
+        renglon.setEa(Ea);
+
+        respuesta.add(renglon);
+
+        if (Ea <= puntofijo.getEaPermitido()) {
+            break;
+        }
+
+        XRa = GX;
+        XL = GX;
+    }
+
+    return respuesta;
+    }
+
+
+   
 }
 
