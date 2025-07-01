@@ -3,6 +3,7 @@ package mx.edu.itses.marc.MetodosNumericos.services;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.marc.MetodosNumericos.domain.Biseccion;
+import mx.edu.itses.marc.MetodosNumericos.domain.NewRapson;
 import mx.edu.itses.marc.MetodosNumericos.domain.PuntoFijo;
 import mx.edu.itses.marc.MetodosNumericos.domain.ReglaFalsa;
 import org.springframework.stereotype.Service;
@@ -149,7 +150,51 @@ public class UnidadIIServiceImpl implements UnidadIIService {
     return respuesta;
     }
 
+    @Override
+    public ArrayList<NewRapson> AlgoritmoDeNewRpason(NewRapson rapson) {
+    ArrayList<NewRapson> respuesta = new ArrayList<>();
+    double XI, XI1, FXI, DerivadaFXI, Ea;
+    XI = rapson.getXI();
+    Ea = 100;
+
+    for (int i = 1; i <= rapson.getIteracionesMaximas(); i++) {
+        FXI = Funciones.Ecuacion(rapson.getFX(), XI);
+        DerivadaFXI = Funciones.Derivada(rapson.getFX(), XI); 
+
+        if (DerivadaFXI == 0) {
+            // Evitar división por cero
+            break;
+        }
+
+        XI1 = XI - (FXI / DerivadaFXI);
+
+        if (i != 1) {
+            Ea = Funciones.ErrorRelativo(XI1, XI);
+        }
+
+        NewRapson renglon = new NewRapson();
+        renglon.setFX(rapson.getFX());
+        renglon.setXI(XI);
+        renglon.setFXI(FXI);
+        renglon.setDerivadaFXI(DerivadaFXI);
+        renglon.setXI1(XI1);
+        renglon.setEa(Ea);
+        renglon.setIteracionesMaximas(rapson.getIteracionesMaximas());
+        respuesta.add(renglon);
+
+        if (Ea <= rapson.getEa()) {
+            break;
+        }
+
+        XI = XI1;
+    }
+
+    return respuesta;
+}
 
    
-}
+    }
+
+
+   
 
