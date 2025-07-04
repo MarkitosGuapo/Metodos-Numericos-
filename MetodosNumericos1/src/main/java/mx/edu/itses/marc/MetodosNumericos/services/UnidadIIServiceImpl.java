@@ -6,7 +6,10 @@ import mx.edu.itses.marc.MetodosNumericos.domain.Biseccion;
 import mx.edu.itses.marc.MetodosNumericos.domain.NewRapson;
 import mx.edu.itses.marc.MetodosNumericos.domain.PuntoFijo;
 import mx.edu.itses.marc.MetodosNumericos.domain.ReglaFalsa;
+import mx.edu.itses.marc.MetodosNumericos.domain.Secante;
+import mx.edu.itses.marc.MetodosNumericos.domain.SecanteModificada;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @Slf4j
@@ -192,8 +195,151 @@ public class UnidadIIServiceImpl implements UnidadIIService {
     return respuesta;
 }
 
-   
+    @Override
+    public ArrayList<SecanteModificada> AlgoritmoDeSecanteModificada(SecanteModificada secantemodificada) {
+   ArrayList<SecanteModificada> respuesta = new ArrayList<>();
+    double XL, X1, FX, FXSIGMA, Ea, XRa, sigma;
+
+    XL = secantemodificada.getXL(); // Valor inicial
+    XRa = 0;
+    sigma = 0.01; // Diferencia pequeña σ
+    Ea = 100;
+
+    // Validar valores por defecto
+    if (secantemodificada.getIteracionesMaximas() == 0) {
+        secantemodificada.setIteracionesMaximas(50);
     }
+
+    if (secantemodificada.getEa() == 0) {
+        secantemodificada.setEa(0.001);
+    }
+
+    for (int i = 1; i <= secantemodificada.getIteracionesMaximas(); i++) {
+    
+        FX = Funciones.Ecuacion(secanteodificada.getFX(), XL);
+
+      
+        X1 = XL + sigma;
+        FXSIGMA = Funciones.Ecuacion(secantemodificada.getFx(), X1);
+
+    
+        double denominador = FXSIGMA - FX;
+        if (denominador == 0) {
+            break; // Evita división por cero
+        }
+
+        // Calcular xi+1 usando secante modificada
+        double XI1 = XL - (FX * sigma) / denominador;
+
+        // Calcular error relativo
+        if (i != 1) {
+            Ea = Funciones.ErrorRelativo(XI1, XRa);
+        }
+
+        // Crear objeto con resultados de la iteración
+        SecanteModificada renglon = new SecanteModificada();
+        renglon.setXL(XL);
+        renglon.setX1(X1);
+        renglon.setFX(FX);
+        renglon.setFXSIGMA(FXSIGMA);
+        renglon.setEa(Ea);
+        renglon.setIteracionesMaximas(secantemodificada.getIteracionesMaximas());
+        renglon.setFx(secantemodificada.getFx());
+
+        respuesta.add(renglon);
+
+       
+        if (Ea <= secantemodificada.getEa()) {
+            break;
+        }
+
+        // Preparar siguiente iteración
+        XRa = XI1;
+        XL = XI1;
+    }
+
+    return respuesta;
+    }
+    
+    @Override
+public ArrayList<Secante> AlgoritmoDeSecante(Secante secante) {
+    ArrayList<Secante> respuesta = new ArrayList<>();
+    
+    double x0 = secante.getX0();
+    double x1 = secante.getX1();
+    double Ea = 100;
+    double Xr = 0;
+    double XrAnt = 0;
+    
+    for (int i = 1; i <= secante.getIteracionesMaximas(); i++) {
+        double fx0 = Funciones.Ecuacion(secante.getFx(), x0);
+        double fx1 = Funciones.Ecuacion(secante.getFx(), x1);
+        
+        if ((fx1 - fx0) == 0) {
+            break; // evita división por cero
+        }
+        
+        Xr = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
+        
+        if (i != 1) {
+            Ea = Funciones.ErrorRelativo(Xr, XrAnt);
+        }
+        
+        Secante renglon = new Secante();
+        renglon.setX0(x0);
+        renglon.setX1(x1);
+        renglon.setFx(secante.getFx());
+        renglon.setEa(Ea);
+        
+        respuesta.add(renglon);
+        
+        if (Ea <= secante.getEa()) {
+            break;
+        }
+        
+        x0 = x1;
+        x1 = Xr;
+        XrAnt = Xr;
+    }
+    
+    return respuesta;
+}
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+}
+   
+   
+    
+
+
+
+
 
 
    

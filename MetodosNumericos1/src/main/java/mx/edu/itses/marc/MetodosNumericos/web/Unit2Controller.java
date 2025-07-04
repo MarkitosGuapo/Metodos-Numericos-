@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.marc.MetodosNumericos.domain.Biseccion;
 import mx.edu.itses.marc.MetodosNumericos.domain.NewRapson;
 import mx.edu.itses.marc.MetodosNumericos.domain.ReglaFalsa;
+import mx.edu.itses.marc.MetodosNumericos.domain.SecanteModificada;
 import mx.edu.itses.marc.MetodosNumericos.services.Funciones;
 import mx.edu.itses.marc.MetodosNumericos.services.UnidadIIService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class Unit2Controller {
     private UnidadIIService puntofijoservice;
     @Autowired
   private UnidadIIService newrapsonService;
+      @Autowired
+    private UnidadIIService unidadIIService; 
     
     @GetMapping("unit2/formbisection")
     public String formBisecccion(Model model) {
@@ -76,7 +79,7 @@ public String solvePuntoFijo(mx.edu.itses.marc.MetodosNumericos.domain.PuntoFijo
     return "unit2/puntofijo/solvepuntofijo"; 
 }
 
-  @GetMapping("/unit2/newRapson")
+  @GetMapping("/unit2/newrapson")
 public String formNewRapson(Model model) {
     NewRapson newrapson = new NewRapson();
     model.addAttribute("newrapson", newrapson);
@@ -88,13 +91,37 @@ public String solvenewrapson(NewRapson newrapson, Model model) {
     var solvenewRapson = newrapsonService.AlgoritmoDeNewRpason(newrapson);
     log.info("Arreglo Newton-Raphson: " + solvenewRapson);
     model.addAttribute("solveNewRapson", solvenewRapson);
-    return "unit2/newrapson/solvenewtonrapson"; 
+    return "unit2/newrapson/solvenewrapson"; 
 }
     
     
- 
+ @GetMapping("/unit2/secantemodificada")
+public String formSecanteModificada(Model model) {
+    SecanteModificada secanteModificada = new SecanteModificada();
+    model.addAttribute("secantemodificada", secanteModificada);
+    return "unit2/secantemodificada/formsecantemodificada"; // 
+}
+
+@PostMapping("/unit2/solvesecantemodificada")
+public String solveSecanteModificada(SecanteModificada secanteModificada, Model model) {
+    var solucion = bisectionservice.AlgoritmoDeSecanteModificada(secanteModificada);
+    log.info("Solución secante modificada: " + solucion);
+    model.addAttribute("solveSecanteModificada", solucion);
+    return "unit2/secantemodificada/solvesecantemodificada";
+}
     
     
-    
+     @GetMapping("/unit2/formsecantemodificada")
+    public String SecanteModificada(Model model) {
+        model.addAttribute("secantemodificada", new SecanteModificada());
+        return "unit2/secantemodificada/formsecantemodificada";
+    }
+
+    @PostMapping("/unit2/solvesecantemodificada")
+    public String solvesecantemodificada(SecanteModificada secantemodificada, Model model) {
+        var resultado = unidadIIService.AlgoritmoDeSecanteModificada(secantemodificada);
+        model.addAttribute("solveSecanteModificada", resultado);
+        return "unit2/secantemodificada/solvesecantemodificada";
+    }
     
 }

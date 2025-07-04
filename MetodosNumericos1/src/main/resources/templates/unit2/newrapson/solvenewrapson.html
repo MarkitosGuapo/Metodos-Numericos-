@@ -29,8 +29,8 @@
     </nav>
     <div class="container mt-5">
         <h3 class="mb-4">Resultados Newton-Raphson</h3>
-        <a href="/unit2/formnewrapson" class="btn btn-secondary mb-3">Volver al formulario</a>
-        <div th:if="${solveNewRapson != null}">
+        <a href="/unit2/newrapson" class="btn btn-secondary mb-3">Volver al formulario</a>
+        <div th:if="${solvenewrapson != null}">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -44,7 +44,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                       <tr th:each="r, iterStat : ${solveNewRapson}">
+                       <tr th:each="r, iterStat : ${solvenewrapson}">
                             <td th:text="${iterStat.index + 1}"></td>
                             <td th:text="${r.XI}"></td>
                             <td th:text="${r.FXI}"></td>
@@ -56,7 +56,7 @@
                 </table>
             </div>
         </div>
-        <div th:if="${solveNewRapson == null or #lists.isEmpty(solveNewRapson)}">
+        <div th:if="${solvenewrapson == null or #lists.isEmpty(solvenewrapson)}">
             <div class="alert alert-warning">No se encontraron resultados para los datos ingresados.</div>
         </div>
     </div>
