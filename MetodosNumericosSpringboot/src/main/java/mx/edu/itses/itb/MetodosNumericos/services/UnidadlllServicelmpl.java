@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.itb.MetodosNumericos.domain.Gauss;
+import mx.edu.itses.itb.MetodosNumericos.domain.GaussJordan;
 import mx.edu.itses.itb.MetodosNumericos.domain.ReglaCramer;
 import org.springframework.stereotype.Service;
 
@@ -302,7 +303,184 @@ private void imprimirMatriz(double[][] matriz, int filas, int columnas) {
     }
 }
 
+@Override
+public GaussJordan AlgoritmoGaussJordan(GaussJordan modelGaussJordan) {
+    // Tamaño de sistema lineal
+    vectorX.clear();
+    switch (modelGaussJordan.getMN()) {
+        case 2 -> {
+            ArrayList<Double> A = modelGaussJordan.getMatrizA();
+            ArrayList<Double> B = modelGaussJordan.getVectorB();
+            
+            // Crear matriz aumentada 
+            double[][] matrizAumentada = {
+                {A.get(0), A.get(1), B.get(0)},
+                {A.get(2), A.get(3), B.get(1)}
+            };
+            
+            log.info("Matriz aumentada inicial:");
+            imprimirMatriz(matrizAumentada, 2, 3);
+            
+            // Aplicar eliminación Gauss-Jordan
+            matrizAumentada = eliminacionGaussJordan(matrizAumentada, 2);
+            
+            log.info("Matriz después de Gauss-Jordan (forma escalonada reducida):");
+            imprimirMatriz(matrizAumentada, 2, 3);
+            
+            // Extraer solución directamente de la diagonal
+            ArrayList<Double> solucion = extraerSolucion(matrizAumentada, 2);
+            vectorX.addAll(solucion);
+            
+            log.info("Solución: X1 = " + vectorX.get(0) + ", X2 = " + vectorX.get(1));
+        }
+        case 3 -> {
+            ArrayList<Double> A = modelGaussJordan.getMatrizA();
+            ArrayList<Double> B = modelGaussJordan.getVectorB();
+            
+            // Crear matriz aumentada 
+            double[][] matrizAumentada = {
+                {A.get(0), A.get(1), A.get(2), B.get(0)},
+                {A.get(3), A.get(4), A.get(5), B.get(1)},
+                {A.get(6), A.get(7), A.get(8), B.get(2)}
+            };
+            
+            log.info("Matriz aumentada inicial:");
+            imprimirMatriz(matrizAumentada, 3, 4);
+            
+            // Aplicar eliminación Gauss-Jordan
+            matrizAumentada = eliminacionGaussJordan(matrizAumentada, 3);
+            
+            log.info("Matriz después de Gauss-Jordan (forma escalonada reducida):");
+            imprimirMatriz(matrizAumentada, 3, 4);
+            
+            // Extraer solución
+            ArrayList<Double> solucion = extraerSolucion(matrizAumentada, 3);
+            vectorX.addAll(solucion);
+            
+            log.info("Solución: X1 = " + vectorX.get(0) + ", X2 = " + vectorX.get(1) + ", X3 = " + vectorX.get(2));
+        }
+        case 4 -> {
+            ArrayList<Double> A = modelGaussJordan.getMatrizA();
+            ArrayList<Double> B = modelGaussJordan.getVectorB();
+            
+            // Crear matriz aumentada 
+            double[][] matrizAumentada = {
+                {A.get(0),  A.get(1),  A.get(2),  A.get(3),  B.get(0)},
+                {A.get(4),  A.get(5),  A.get(6),  A.get(7),  B.get(1)},
+                {A.get(8),  A.get(9),  A.get(10), A.get(11), B.get(2)},
+                {A.get(12), A.get(13), A.get(14), A.get(15), B.get(3)}
+            };
+            
+            log.info("Matriz aumentada inicial 4x5:");
+            imprimirMatriz(matrizAumentada, 4, 5);
+            
+            // Aplicar eliminación Gauss-Jordan
+            matrizAumentada = eliminacionGaussJordan(matrizAumentada, 4);
+            
+            log.info("Matriz después de Gauss-Jordan (forma escalonada reducida):");
+            imprimirMatriz(matrizAumentada, 4, 5);
+            
+            // Extraer solución directamente de la diagonal
+            ArrayList<Double> solucion = extraerSolucion(matrizAumentada, 4);
+            vectorX.addAll(solucion);
+            
+            log.info("Solución: X1 = " + vectorX.get(0) + ", X2 = " + vectorX.get(1) + 
+                     ", X3 = " + vectorX.get(2) + ", X4 = " + vectorX.get(3));
+        }
+    }
     
+    modelGaussJordan.setVectorX(vectorX);
+    return modelGaussJordan;
+}
+
+// Método principal de eliminación Gauss-Jordan
+private double[][] eliminacionGaussJordan(double[][] matriz, int n) {
+    double[][] resultado = new double[n][n + 1];
+    
+    // Copiar matriz original
+    for (int i = 0; i < n; i++) {
+        System.arraycopy(matriz[i], 0, resultado[i], 0, n + 1);
+    }
+    
+    //  Eliminación hacia adelante 
+    log.info(" Eliminación hacia adelante");
+    for (int k = 0; k < n; k++) {
+        // Pivoteo parcial
+        int maxRow = k;
+        for (int i = k + 1; i < n; i++) {
+            if (Math.abs(resultado[i][k]) > Math.abs(resultado[maxRow][k])) {
+                maxRow = i;
+            }
+        }
+        
+        // Intercambiar filas 
+        if (maxRow != k) {
+            double[] temp = resultado[k];
+            resultado[k] = resultado[maxRow];
+            resultado[maxRow] = temp;
+            log.info("Intercambiando fila " + k + " con fila " + maxRow);
+        }
+        
+        // Verificar que el pivote no sea cero
+        if (Math.abs(resultado[k][k]) < 1e-10) {
+            log.error("Sistema sin solución única - pivote cero en posición [" + k + "][" + k + "]");
+            throw new RuntimeException("Sistema sin solución única");
+        }
+        
+        // Normalizar la fila del pivote
+        double pivote = resultado[k][k];
+        log.info("Normalizando fila " + k + " dividiendo por pivote: " + pivote);
+        for (int j = 0; j < n + 1; j++) {
+            resultado[k][j] /= pivote;
+        }
+        
+        // Eliminación hacia adelante
+        for (int i = k + 1; i < n; i++) {
+            double factor = resultado[i][k];
+            if (Math.abs(factor) > 1e-10) {
+                log.info("Eliminando hacia adelante - fila " + i + ", factor: " + factor);
+                for (int j = 0; j < n + 1; j++) {
+                    resultado[i][j] -= factor * resultado[k][j];
+                }
+            }
+        }
+        
+        log.info("Matriz después del paso " + (k + 1) + " hacia adelante:");
+        imprimirMatriz(resultado, n, n + 1);
+    }
+    
+    // Eliminación hacia atrás
+    log.info("Eliminación hacia atras");
+    for (int k = n - 1; k > 0; k--) {
+        for (int i = k - 1; i >= 0; i--) {
+            double factor = resultado[i][k];
+            if (Math.abs(factor) > 1e-10) {
+                log.info("Eliminando hacia atras - fila " + i + ", factor: " + factor);
+                for (int j = 0; j < n + 1; j++) {
+                    resultado[i][j] -= factor * resultado[k][j];
+                }
+            }
+        }
+        
+        log.info("Matriz despues del paso " + k + " hacia atras:");
+        imprimirMatriz(resultado, n, n + 1);
+    }
+    
+    return resultado;
+}
+
+// Extraer solución de la matriz
+private ArrayList<Double> extraerSolucion(double[][] matriz, int n) {
+    ArrayList<Double> x = new ArrayList<>(Collections.nCopies(n, 0.0));
+    
+    // En la forma escalonada reducida, la solución está directamente en la última columna
+    for (int i = 0; i < n; i++) {
+        x.set(i, matriz[i][n]);
+        log.info("X" + (i + 1) + " = " + x.get(i));
+    }
+    
+    return x;
+}
     
     
     

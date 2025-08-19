@@ -3,6 +3,7 @@ package mx.edu.itses.itb.MetodosNumericos.web;
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.itb.MetodosNumericos.domain.Gauss;
+import mx.edu.itses.itb.MetodosNumericos.domain.GaussJordan;
 import mx.edu.itses.itb.MetodosNumericos.domain.ReglaCramer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,8 +59,19 @@ public String solveGaussiana(Gauss modelGauss, Errors errores, Model model) {
     return "unit3/Gauss/solvegaussiana";
 }
     
-    
-    
-    
-    
+    //Eliminacion Gauss-Jordan 
+@GetMapping("/unit3/formgaussjordan")
+public String formGaussJordan(Model model) {
+    GaussJordan modelGaussJordan = new GaussJordan();
+    model.addAttribute("modelGaussJordan", modelGaussJordan);
+    return "unit3/GaussJordan/formgaussjordan";
+}
+
+@PostMapping("/unit3/solvegaussjordan")
+public String solveGaussJordan(GaussJordan modelGaussJordan, Errors errores, Model model) {
+    var solveGaussJordan = unidadIIIsrv.AlgoritmoGaussJordan(modelGaussJordan);
+    model.addAttribute("solveGaussJordan", solveGaussJordan);
+    return "unit3/GaussJordan/solvegaussjordan";
+}
+  
 }
