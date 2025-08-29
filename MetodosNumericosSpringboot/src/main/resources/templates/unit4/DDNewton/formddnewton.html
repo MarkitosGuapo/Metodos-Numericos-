@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Métodos Numéricos</title>
+
+        <!-- Bootstrap CSS -->
+        <link 
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+            rel="stylesheet" 
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+            crossorigin="anonymous"
+            >   
+
+        <!-- Bootstrap JS and dependencies -->
+        <script 
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+            crossorigin="anonymous"
+        ></script>
+    </head>
+
+    <script th:inline="javascript">
+        function crearTabla() {
+            var orden = parseInt(document.getElementById('orden').value);
+            
+            // Validar entrada
+            if (!orden || orden < 1 || orden > 4) {
+                alert('Por favor ingrese un orden válido (1, 2, 3 o 4)');
+                return;
+            }
+            
+            var numPuntos = orden + 1; // n+1 puntos para polinomio de orden n
+            
+            var contenedorPuntos = document.getElementById('ContenedorPuntos');
+            contenedorPuntos.replaceChildren();
+
+            // Crear tabla de puntos
+            var tabla = document.createElement('table');
+            tabla.className = "table table-bordered";
+            contenedorPuntos.appendChild(tabla);
+
+            // Crear encabezado
+            var encabezado = document.createElement('thead');
+            encabezado.className = "table-dark";
+            tabla.appendChild(encabezado);
+            var filaEncabezado = document.createElement('tr');
+            encabezado.appendChild(filaEncabezado);
+            
+            var thPunto = document.createElement('th');
+            thPunto.textContent = 'Punto';
+            filaEncabezado.appendChild(thPunto);
+            
+            var thX = document.createElement('th');
+            thX.textContent = 'X';
+            filaEncabezado.appendChild(thX);
+            
+            var thY = document.createElement('th');
+            thY.textContent = 'Y = f(X)';
+            filaEncabezado.appendChild(thY);
+
+            // Crear cuerpo de la tabla
+            var cuerpo = document.createElement('tbody');
+            tabla.appendChild(cuerpo);
+
+            for (var i = 0; i < numPuntos; i++) {
+                var fila = document.createElement('tr');
+                cuerpo.appendChild(fila);
+                
+                // Columna número de punto
+                var celdaPunto = document.createElement('td');
+                celdaPunto.textContent = 'P' + (i + 1);
+                celdaPunto.className = "text-center fw-bold";
+                fila.appendChild(celdaPunto);
+                
+                // Columna X
+                var celdaX = document.createElement('td');
+                var inputX = document.createElement('input');
+                inputX.type = 'number';
+                inputX.step = 'any';
+                inputX.name = 'puntosX[]';
+                inputX.placeholder = 'x' + (i + 1);
+                inputX.className = "form-control";
+                inputX.required = true;
+                celdaX.appendChild(inputX);
+                fila.appendChild(celdaX);
+                
+                // Columna Y
+                var celdaY = document.createElement('td');
+                var inputY = document.createElement('input');
+                inputY.type = 'number';
+                inputY.step = 'any';
+                inputY.name = 'puntosY[]';
+                inputY.placeholder = 'f(x' + (i + 1) + ')';
+                inputY.className = "form-control";
+                inputY.required = true;
+                celdaY.appendChild(inputY);
+                fila.appendChild(celdaY);
+            }
+
+            // Mostrar sección de interpolación
+            var seccionInterpolacion = document.getElementById('seccionInterpolacion');
+            seccionInterpolacion.style.display = 'block';
+
+            var resolver = document.getElementById('resolver');
+            resolver.style.display = 'block';
+        }
+    </script>
+
+    <body>
+        <div class="container">
+            <nav th:replace="/layout/template :: menu"> </nav>
+            <div th:replace="/layout/template :: bannerunit4"></div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="/unit4">Interpolación</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Formulario Diferencias Divididas de Newton</li>
+                </ol>
+            </nav>
+
+            <!-- Mostrar errores si los hay -->
+            <div th:if="${error}" class="alert alert-danger" role="alert">
+                <span th:text="${error}"></span>
+            </div>
+
+            <form class="row g-3" th:action="@{/unit4/solveddnewton}" method="post" th:object="${modelDDNewton}"> 
+                <div class="container">
+                    <h1 class="text-primary">Interpolación: Diferencias Divididas de Newton</h1>
+                    <h3 class="text-secondary">Ingresa los parámetros siguientes</h3>
+                    
+                    <!-- Parámetros principales -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="orden" class="form-label">Orden del Polinomio</label>
+                            <select class="form-control" id="orden" name="orden" required>
+                                <option value="">Seleccione...</option>
+                                <option value="1">Orden 1 (Lineal - 2 puntos)</option>
+                                <option value="2">Orden 2 (Cuadrático - 3 puntos)</option>
+                                <option value="3">Orden 3 (Cúbico - 4 puntos)</option>
+                                <option value="4">Orden 4 (Cuártico - 5 puntos)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-secondary d-block" onclick="crearTabla()">
+                                Crear Tabla de Puntos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contenedor de puntos -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h5>Puntos Conocidos</h5>
+                            <div id="ContenedorPuntos"></div>
+                        </div>
+                    </div>
+
+                    <!-- Valor a interpolar -->
+                    <div id="seccionInterpolacion" style="display: none;" class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="valorInterpolacion" class="form-label">Valor de X a Interpolar</label>
+                            <input type="number" step="any" class="form-control" 
+                                   id="valorInterpolacion" name="valorInterpolacion" 
+                                   placeholder="Ingrese el valor de X" required>
+                            <div class="form-text">Valor donde deseas encontrar f(x) usando interpolación</div>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="alert alert-info" role="alert">
+                                <h6><strong>Información sobre el Método:</strong></h6>
+                                <ul class="mb-0">
+                                    <li><strong>Diferencias Divididas de Newton:</strong> Método para construir polinomios de interpolación</li>
+                                    <li><strong>Ventaja:</strong> Permite agregar puntos fácilmente sin recalcular todo</li>
+                                    <li><strong>Requisito:</strong> Los valores de X deben ser únicos (no repetidos)</li>
+                                    <li><strong>Aplicación:</strong> Estimación de valores intermedios entre puntos conocidos</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón resolver -->
+                    <div id="resolver" class="row" style="display: none">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-calculator"></i> Calcular Interpolación
+                            </button>
+                        </div>
+                    </div>                       
+                </div>
+            </form> 
+        </div>
+    </body>
+</html>

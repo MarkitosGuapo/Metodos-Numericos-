@@ -39,8 +39,8 @@
                 </div>
                 <div class="col-md-4">
                     <h5>Solución X</h5>
-                    <p><strong>X1 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[0], 1, 6)}">x1</span></p>
-                    <p><strong>X2 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[1], 1, 6)}">x2</span></p>
+                    <p><strong>X1 = </strong><span th:text="${solveGaussJordan.vectorX[0]}">x1</span></p>
+                    <p><strong>X2 = </strong><span th:text="${solveGaussJordan.vectorX[1]}">x2</span></p>
                 </div>
             </div>
         </div>
@@ -63,9 +63,9 @@
                 </div>
                 <div class="col-md-4">
                     <h5>Solución X</h5>
-                    <p><strong>X1 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[0], 1, 6)}">x1</span></p>
-                    <p><strong>X2 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[1], 1, 6)}">x2</span></p>
-                    <p><strong>X3 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[2], 1, 6)}">x3</span></p>
+                    <p><strong>X1 = </strong><span th:text="${solveGaussJordan.vectorX[0]}">x1</span></p>
+                    <p><strong>X2 = </strong><span th:text="${solveGaussJordan.vectorX[1]}">x2</span></p>
+                    <p><strong>X3 = </strong><span th:text="${solveGaussJordan.vectorX[2]}">x3</span></p>
                 </div>
             </div>
         </div>
@@ -75,12 +75,21 @@
             <h3>Sistema 4x4</h3>
             <div class="alert alert-success">
                 <h5>Solución:</h5>
-                <p><strong>X1 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[0], 1, 6)}">x1</span></p>
-                <p><strong>X2 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[1], 1, 6)}">x2</span></p>
-                <p><strong>X3 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[2], 1, 6)}">x3</span></p>
-                <p><strong>X4 = </strong><span th:text="${#numbers.formatDecimal(solveGaussJordan.vectorX[3], 1, 6)}">x4</span></p>
+                <p><strong>X1 = </strong><span th:text="${solveGaussJordan.vectorX[0]}">x1</span></p>
+                <p><strong>X2 = </strong><span th:text="${solveGaussJordan.vectorX[1]}">x2</span></p>
+                <p><strong>X3 = </strong><span th:text="${solveGaussJordan.vectorX[2]}">x3</span></p>
+                <p><strong>X4 = </strong><span th:text="${solveGaussJordan.vectorX[3]}">x4</span></p>
             </div>
         </div>
     </div>
+    
+         <!-- Botón para regresar -->
+        <div class="d-flex justify-content-center mt-4">
+            <a href="/unit3/formgaussordan" class="btn btn-secondary me-2">Nuevo Cálculo</a>
+            <a href="/unit3" class="btn btn-primary">Regresar a Métodos</a>
+        </div>
+    
+    
+    
 </body>
 </html>

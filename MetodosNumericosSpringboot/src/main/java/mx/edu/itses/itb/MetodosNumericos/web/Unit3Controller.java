@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
 import mx.edu.itses.itb.MetodosNumericos.domain.Gauss;
 import mx.edu.itses.itb.MetodosNumericos.domain.GaussJordan;
+import mx.edu.itses.itb.MetodosNumericos.domain.GaussSeidel;
+import mx.edu.itses.itb.MetodosNumericos.domain.Jacobi;
 import mx.edu.itses.itb.MetodosNumericos.domain.ReglaCramer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +14,7 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import mx.edu.itses.itb.MetodosNumericos.services.UnidadIIIService;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 @Slf4j
@@ -59,8 +62,7 @@ public String solveGaussiana(Gauss modelGauss, Errors errores, Model model) {
     return "unit3/Gauss/solvegaussiana";
 }
     
-    //Eliminacion Gauss-Jordan 
-@GetMapping("/unit3/formgaussjordan")
+   @GetMapping("/unit3/formgaussjordan")
 public String formGaussJordan(Model model) {
     GaussJordan modelGaussJordan = new GaussJordan();
     model.addAttribute("modelGaussJordan", modelGaussJordan);
@@ -74,4 +76,99 @@ public String solveGaussJordan(GaussJordan modelGaussJordan, Errors errores, Mod
     return "unit3/GaussJordan/solvegaussjordan";
 }
   
+@GetMapping("/unit3/formjacobi")
+public String formJacobi(Model model) {
+    Jacobi modelJacobi = new Jacobi();
+    // CORRECCIÓN: Establecer valores por defecto
+    modelJacobi.setTolerancia(1.0);
+    modelJacobi.setMaxIteraciones(50);
+    model.addAttribute("modelJacobi", modelJacobi);
+    return "unit3/jacobi/formjacobi";
 }
+
+@PostMapping("/unit3/solvejacobi")
+public String solveJacobi(@ModelAttribute Jacobi modelJacobi, Errors errores, Model model) {
+    try {
+        log.info("=== DATOS RECIBIDOS EN CONTROLADOR ===");
+        log.info("MN=" + modelJacobi.getMN());
+        log.info("Tolerancia=" + modelJacobi.getTolerancia());
+        log.info("Max Iteraciones=" + modelJacobi.getMaxIteraciones());
+        log.info("Matriz A: " + modelJacobi.getMatrizA());
+        log.info("Vector B: " + modelJacobi.getVectorB());
+        log.info("Valores iniciales: " + modelJacobi.getValoresIniciales());
+        
+        // CORRECCIÓN: Validación básica
+        if (modelJacobi.getMatrizA() == null || modelJacobi.getVectorB() == null || 
+            modelJacobi.getValoresIniciales() == null) {
+            model.addAttribute("error", "Datos incompletos. Por favor complete todos los campos.");
+            return "unit3/jacobi/formjacobi";
+        }
+        
+        var solveJacobi = unidadIIIsrv.AlgoritmoJacobi(modelJacobi);
+        model.addAttribute("solveJacobi", solveJacobi);
+        
+        log.info("=== RESULTADO PROCESADO ===");
+        log.info("Convergio: " + solveJacobi.isConvergio());
+        log.info("Iteraciones realizadas: " + solveJacobi.getIteracionesRealizadas());
+        log.info("Mensaje: " + solveJacobi.getMensajeEstado());
+        
+        return "unit3/jacobi/solvejacobi";
+        
+    } catch (Exception e) {
+        log.error("Error procesando Jacobi: ", e);
+        model.addAttribute("error", "Error procesando el sistema: " + e.getMessage());
+        return "unit3/jacobi/formjacobi";
+    }
+}
+
+@GetMapping("/unit3/formgaussseidel")
+public String formGaussSeidel(Model model) {
+    GaussSeidel modelGaussSeidel = new GaussSeidel();
+    // Establecer valores por defecto
+    modelGaussSeidel.setTolerancia(1.0);
+    modelGaussSeidel.setMaxIteraciones(50);
+    model.addAttribute("modelGaussSeidel", modelGaussSeidel);
+    return "unit3/gaussseidel/formgaussseidel"; // ← ERROR AQUÍ
+}
+
+@PostMapping("/unit3/solvegaussseidel")
+public String solveGaussSeidel(@ModelAttribute GaussSeidel modelGaussSeidel, Errors errores, Model model) {
+    try {
+        log.info("=== DATOS RECIBIDOS EN CONTROLADOR GAUSS-SEIDEL ===");
+        log.info("MN=" + modelGaussSeidel.getMN());
+        log.info("Tolerancia=" + modelGaussSeidel.getTolerancia());
+        log.info("Max Iteraciones=" + modelGaussSeidel.getMaxIteraciones());
+        log.info("Matriz A: " + modelGaussSeidel.getMatrizA());
+        log.info("Vector B: " + modelGaussSeidel.getVectorB());
+        log.info("Valores iniciales: " + modelGaussSeidel.getValoresIniciales());
+        
+        // Validación básica
+        if (modelGaussSeidel.getMatrizA() == null || modelGaussSeidel.getVectorB() == null || 
+            modelGaussSeidel.getValoresIniciales() == null) {
+            model.addAttribute("error", "Datos incompletos. Por favor complete todos los campos.");
+            return "unit3/gaussseidel/formgaussseidel";
+        }
+        
+        var solveGaussSeidel = unidadIIIsrv.AlgoritmoGaussSeidel(modelGaussSeidel);
+        model.addAttribute("solveGaussSeidel", solveGaussSeidel);
+        
+        log.info("=== RESULTADO PROCESADO GAUSS-SEIDEL ===");
+        log.info("Convergio: " + solveGaussSeidel.isConvergio());
+        log.info("Iteraciones realizadas: " + solveGaussSeidel.getIteracionesRealizadas());
+        log.info("Mensaje: " + solveGaussSeidel.getMensajeEstado());
+        
+        return "unit3/gaussseidel/solvegaussseidel";
+        
+    } catch (Exception e) {
+        log.error("Error procesando Gauss-Seidel: ", e);
+        model.addAttribute("error", "Error procesando el sistema: " + e.getMessage());
+        return "unit3/gaussseidel/solvegaussseidel";
+    }
+}
+
+
+
+
+
+}
+

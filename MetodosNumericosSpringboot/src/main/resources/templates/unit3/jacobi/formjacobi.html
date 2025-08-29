@@ -23,76 +23,132 @@
 
     <script th:inline="javascript">
         function crearMatriz() {
-            var MN = document.getElementById('MN').value;
+            var MN = parseInt(document.getElementById('MN').value);
+            
+            // Validar entrada
+            if (!MN || MN < 2 || MN > 4) {
+                alert('Por favor ingrese un tamaño de matriz válido (2, 3 o 4)');
+                return;
+            }
+            
             var ContenedorA = document.getElementById('ContenedorMatriz');
             ContenedorA.replaceChildren();
             var ContenedorB = document.getElementById('ContenedorB');
             ContenedorB.replaceChildren();
+            var ContenedorIniciales = document.getElementById('ContenedorIniciales');
+            ContenedorIniciales.replaceChildren();
+
+            // Crear matriz A y vector B
             for (j = 1; j <= MN; j++) {
                 var renglonA = document.createElement('div');
-                renglonA.className = "row";
+                renglonA.className = "row mb-1";
                 ContenedorA.appendChild(renglonA);
                 for (i = 1; i <= MN; i++) {
                     var columnaA = document.createElement('div');
                     columnaA.className = "col";
                     renglonA.appendChild(columnaA);
                     var coeficiente = document.createElement('input');
-                    coeficiente.type = 'text';
+                    coeficiente.type = 'number';
+                    coeficiente.step = 'any';
                     coeficiente.name = 'matrizA[]';
                     coeficiente.placeholder = 'a' + j + i;
                     coeficiente.className = "form-control";
+                    coeficiente.required = true;
                     columnaA.appendChild(coeficiente);
                 }
+
+                // Vector B
                 var vectorb = document.createElement('input');
-                vectorb.type = 'text';
+                vectorb.type = 'number';
+                vectorb.step = 'any';
                 vectorb.name = 'vectorB[]';
                 vectorb.placeholder = 'b' + j;
                 vectorb.className = "form-control";
+                vectorb.required = true;
                 var renglonB = document.createElement('div');
-                renglonB.className = "row";
+                renglonB.className = "row mb-1";
                 ContenedorB.appendChild(renglonB);
                 var columnaB = document.createElement('div');
                 columnaB.className = "col";
                 renglonB.appendChild(columnaB);
                 columnaB.appendChild(vectorb);
+
+                // Valores iniciales
+                var valorInicial = document.createElement('input');
+                valorInicial.type = 'number';
+                valorInicial.step = 'any';
+                valorInicial.name = 'valoresIniciales[]';
+                valorInicial.placeholder = 'x' + j + '₀';
+                valorInicial.className = "form-control";
+                valorInicial.value = '0';
+                valorInicial.required = true;
+                var renglonInicial = document.createElement('div');
+                renglonInicial.className = "row mb-1";
+                ContenedorIniciales.appendChild(renglonInicial);
+                var columnaInicial = document.createElement('div');
+                columnaInicial.className = "col";
+                renglonInicial.appendChild(columnaInicial);
+                columnaInicial.appendChild(valorInicial);
             }
+
             var resolver = document.getElementById('resolver');
             resolver.style.display = 'block';
         }
     </script>
+
     <body>
         <div class="container">
             <nav th:replace="/layout/template :: menu"> </nav>
             <div th:replace="/layout/template :: bannerunit3"></div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/index.html">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="/">Inicio</a></li>
                     <li class="breadcrumb-item"><a href="/unit3">Sistemas Lineales</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Formulario Gauss-Jordan</li>
+                    <li class="breadcrumb-item active" aria-current="page">Formulario Método de Jacobi</li>
                 </ol>
             </nav>
 
-            <form class="row g-3" th:action="@{/unit3/solvegaussjordan}" method="post" th:object="${modelGaussJordan}"> 
+            <!-- Mostrar errores si los hay -->
+            <div th:if="${error}" class="alert alert-danger" role="alert">
+                <span th:text="${error}"></span>
+            </div>
+
+            <form class="row g-3" th:action="@{/unit3/solvejacobi}" method="post" th:object="${modelJacobi}"> 
                 <div class="container">
-                    <h1 class="text">Método Directo: Gauss-Jordan</h1>
+                    <h1 class="text">Método Iterativo: Jacobi</h1>
                     <h3 class="text">Ingresa los parámetros siguientes</h3>
-                    <div class="alert alert-success" role="alert">
-                        <strong>Gauss-Jordan:</strong> Convierte el sistema en forma escalonada reducida (matriz identidad) eliminando tanto hacia adelante como hacia atrás. La solución se obtiene directamente sin sustitución.
-                        <br><strong>Dimensiones soportadas:</strong> 2x2, 3x3 y 4x4
-                        <br><strong>Ventaja:</strong> Solución directa en la última columna de la matriz resultante
-                    </div>
+                    
+                    <!-- Parámetros principales -->
                     <div class="row">
                         <div class="col-md-3">
                             <label for="MN" class="form-label"># Dimensión de la Matriz Cuadrada</label>
-                            <input type="text" class="form-control" id="MN" name="MN">
+                            <select class="form-control" id="MN" name="MN" required>
+                                <option value="">Seleccione...</option>
+                                <option value="2">2x2</option>
+                                <option value="3">3x3</option>
+                                <option value="4">4x4</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tolerancia" class="form-label">Tolerancia (%)</label>
+                            <input type="number" step="0.01" min="0.01" max="100" class="form-control" 
+                                   id="tolerancia" name="tolerancia" value="1.0" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="maxIteraciones" class="form-label">Máximo Iteraciones</label>
+                            <input type="number" min="1" max="1000" class="form-control" 
+                                   id="maxIteraciones" name="maxIteraciones" value="50" required>
                         </div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-4">
                             <br>
                             <button type="button" class="btn btn-secondary" onclick="crearMatriz()">Crear Matriz</button>
                         </div>
                     </div>
+
+                    <!-- Contenedores de matrices -->
                     <div class="row">
                         <div class="Contenedor text-center">
                             <div class="row align-items-start">
@@ -104,14 +160,22 @@
                                     <p><strong>Vector B</strong></p>
                                     <div id="ContenedorB"></div>
                                 </div>
+                                <div class="col-2">
+                                    <p><strong>Valores Iniciales</strong></p>
+                                    <div id="ContenedorIniciales"></div>
+                                </div>
                             </div>
                         </div>
-                        <div id="resolver" class=" p-2 row" style="display: none">
+
+                        <!-- Botón resolver -->
+                        <div id="resolver" class="p-2 row" style="display: none">
                             <div class="col-12">
                                 <br>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-calculator-fill"></i> Resolver por Gauss-Jordan
-                                </button>
+                                <div class="alert alert-info" role="alert">
+                                    <strong>Nota:</strong> Para garantizar la convergencia, asegúrate de que la matriz sea 
+                                    diagonalmente dominante (|aᵢᵢ| > Σ|aᵢⱼ| para i≠j en cada fila).
+                                </div>
+                                <button type="submit" class="btn btn-primary">Resolver Sistema con Jacobi</button>
                             </div>
                         </div>                       
                     </div>
